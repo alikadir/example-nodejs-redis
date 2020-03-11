@@ -8,30 +8,46 @@ global.redisSetKey = () => {
   client.set(
     "user:ali",
     JSON.stringify({ name: "ali", age: 32, gender: "male" }),
-    function(err, result) {
+    function(err, reply) {
       console.error(err);
-      console.log(result);
+      console.log(reply);
     }
   );
 };
 
 global.redisGetKey = () => {
-  client.get("user:ali", (err, result) => {
+  client.get("user:ali", (err, reply) => {
     console.error(err);
-    console.log(result);
+    console.log(reply);
   });
 };
 
 global.redisGetKeys = () => {
-  client.keys("user:*", (err, result) => {
+  client.keys("user:*", (err, reply) => {
     console.error(err);
-    console.log(result);
+    console.log(reply);
 
-    result.forEach(key => {
-      client.get(key, (err, result) => {
-        console.log(result);
+    reply.forEach(key => {
+      client.get(key, (err, reply) => {
+        console.log(reply);
       });
     });
+  });
+};
+
+global.redisPublishMessage = () => {
+  client.publish("sample-channel", "sample message...", (err, reply) => {
+    console.error(err);
+    console.log(reply); // number of client that is submitted message
+  });
+};
+
+global.redisSubScribeMessage = () => {
+  client.subscribe("sample-channel");
+  client.on("message", (channel, message) => {
+    console.log("receive message; ");
+    console.log("channel: ", channel);
+    console.log("message: ", message);
   });
 };
 
@@ -49,4 +65,3 @@ rl.question(`Selected Function: `, answer => {
   global[functionList[answer]]();
 });
 //endregion
-
