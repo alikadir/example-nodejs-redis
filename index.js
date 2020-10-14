@@ -22,7 +22,9 @@ const getAsync = promisify(client.get).bind(client);
  
 const value = await getAsync("key");
 */
+
 // alternative npm i ioredis
+// Also we can add TTL to key client.expire("user:ali", 10); // seconds
 
 global.redisGetKey = () => {
   client.get("user:ali", (err, reply) => {
