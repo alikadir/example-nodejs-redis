@@ -15,6 +15,15 @@ global.redisSetKey = () => {
   );
 };
 
+// redis library does not support Promise build-in now (maybe v4) so we use callback "function (err, reply) { }"
+/*
+const { promisify } = require("util");
+const getAsync = promisify(client.get).bind(client);
+ 
+const value = await getAsync("key");
+*/
+// alternative npm i ioredis
+
 global.redisGetKey = () => {
   client.get("user:ali", (err, reply) => {
     console.error(err);
