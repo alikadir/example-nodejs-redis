@@ -2,9 +2,18 @@ const readline = require("readline");
 const redis = require("redis");
 const client = redis.createClient();
 
-//the global object is like window object in browser
 
-global.redisSetKey = () => {
+const getGlobal = () => {
+  if (typeof self !== 'undefined') { return self; } // in nodejs
+  if (typeof window !== 'undefined') { return window; } // in browser
+  if (typeof global !== 'undefined') { return global; } 
+  throw new Error('unable to locate global object');
+};
+
+const myGlobal = getGlobal();
+
+
+myGlobal.redisSetKey = () => {
   client.set(
     "user:ali",
     JSON.stringify({ name: "ali", age: 32, gender: "male" }),
@@ -26,14 +35,14 @@ const value = await getAsync("key");
 // alternative npm i ioredis
 // Also we can add TTL to key client.expire("user:ali", 10); // seconds
 
-global.redisGetKey = () => {
+myGlobal.redisGetKey = () => {
   client.get("user:ali", (err, reply) => {
     console.error(err);
     console.log(reply);
   });
 };
 
-global.redisGetKeys = () => {
+myGlobal.redisGetKeys = () => {
   client.keys("user:*", (err, reply) => {
     console.error(err);
     console.log(reply);
@@ -46,14 +55,14 @@ global.redisGetKeys = () => {
   });
 };
 
-global.redisPublishMessage = () => {
+myGlobal.redisPublishMessage = () => {
   client.publish("sample-channel", "sample message...", (err, reply) => {
     console.error(err);
     console.log(reply); // number of client that is submitted message
   });
 };
 
-global.redisSubScribeMessage = () => {
+myGlobal.redisSubScribeMessage = () => {
   client.subscribe("sample-channel");
   client.on("message", (channel, message) => {
     console.log("receive message; ");
@@ -63,7 +72,7 @@ global.redisSubScribeMessage = () => {
 };
 
 //region Commandline Settings
-const functionList = Object.keys(global).filter(item => item.includes("redis"));
+const functionList = Object.keys(myGlobal).filter(item => item.includes("redis"));
 console.log(functionList.map((item, index) => `${index} - ${item}`).join("\n"));
 
 let rl = readline.createInterface({
@@ -73,6 +82,6 @@ let rl = readline.createInterface({
 });
 
 rl.question(`Selected Function: `, answer => {
-  global[functionList[answer]]();
+  myGlobal[functionList[answer]]();
 });
 //endregion
